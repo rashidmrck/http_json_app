@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,13 +25,22 @@ class _JsonState extends State<Json> {
   List data;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     this.getJsondata();
   }
 
-  Future<String> getJsondata()async{
-    var response = await 
+  Future<String> getJsondata() async {
+    var response = await http.get(
+      //encode the url
+      Uri.encodeFull(url),
+      headers: {"Accept": "application/json"}
+    );
+    setState(() {
+      var convertdatatojson = jsonDecode(response.body);
+      data = convertdatatojson['results'];
+    });
+
     return "Success";
   }
 
@@ -40,10 +51,14 @@ class _JsonState extends State<Json> {
         title: Text("Json App"),
       ),
       body: ListView.builder(
-        itemCount: 1,
+        itemCount: data == null ? 0 : data.length,
         itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text('data'),
+          return InkWell(
+            
+            onTap: (){},
+                      child: ListTile(
+              title: Text(data[index]['name']),
+            ),
           );
         },
       ),
